@@ -1,19 +1,21 @@
 const { WETH } = require("@sushiswap/sdk")
 
-module.exports = async function ({ ethers: { getNamedSigner }, getNamedAccounts, deployments }) {
+module.exports = async function ({ ethers, getNamedAccounts, deployments }) {
   const { deploy } = deployments
-
   const { deployer, dev } = await getNamedAccounts()
 
   const chainId = await getChainId()
 
-  const factory = await ethers.getContract("UniswapV2Factory")
-  const bar = await ethers.getContract("SushiBar")
-  const sushi = await ethers.getContract("SushiToken")
-  
+  const Factory = await deployments.get("UniswapV2Factory");
+  const factory = new ethers.Contract(Factory.address, Factory.abi, ethers.provider.getSigner(deployer));
+  const Bar = await deployments.get("SushiBar");
+  const bar = new ethers.Contract(Bar.address, Bar.abi, ethers.provider.getSigner(deployer));
+  const Sushi = await deployments.get("SushiToken");
+  const sushi = new ethers.Contract(Sushi.address, Sushi.abi, ethers.provider.getSigner(deployer));
+
   let wethAddress;
-  
-  if (chainId === '31337') {
+
+  if (chainId === '420') {
     wethAddress = (await deployments.get("WETH9Mock")).address
   } else if (chainId in WETH) {
     wethAddress = WETH[chainId].address
@@ -28,7 +30,8 @@ module.exports = async function ({ ethers: { getNamedSigner }, getNamedAccounts,
     deterministicDeployment: false
   })
 
-  const maker = await ethers.getContract("SushiMaker")
+  const Maker = await deployments.get("SushiMaker");
+  const maker = new ethers.Contract(Maker.address, Maker.abi, ethers.provider.getSigner(deployer));
   if (await maker.owner() !== dev) {
     console.log("Setting maker owner")
     await (await maker.transferOwnership(dev, true, false)).wait()
@@ -37,7 +40,7 @@ module.exports = async function ({ ethers: { getNamedSigner }, getNamedAccounts,
   // if (await factory.feeTo() !== address) {
   //   // Set FeeTo to maker
   //   console.log("Setting factory feeTo to maker address")
-  //   await (await factory.connect(await getNamedSigner('dev')).setFeeTo(address)).wait()
+  //   await (await factory.connect(ethers.provider.getSigner(dev)).setFeeTo(address)).wait()
   // }
 }
 

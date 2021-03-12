@@ -19,3 +19,4 @@ module.exports = async function ({ ethers, getNamedAccounts, deployments, getCha
 }
 
 module.exports.tags = ["UniswapV2Factory"]
+module.exports.dependencies = ["Mocks"]

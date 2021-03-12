@@ -3,8 +3,9 @@ module.exports = async function ({ ethers, deployments, getNamedAccounts }) {
 
   const { deployer, dev } = await getNamedAccounts()
 
-  const sushi = await ethers.getContract("SushiToken")
-  
+  const SushiToken = await deployments.get("SushiToken");
+  const sushi = new ethers.Contract(SushiToken.address, SushiToken.abi, ethers.provider.getSigner(deployer));
+
   const { address } = await deploy("MasterChef", {
     from: deployer,
     args: [sushi.address, dev, "1000000000000000000000", "0", "1000000000000000000000"],
@@ -18,7 +19,8 @@ module.exports = async function ({ ethers, deployments, getNamedAccounts }) {
     await (await sushi.transferOwnership(address)).wait()
   }
 
-  const masterChef = await ethers.getContract("MasterChef")
+  const MasterChef = await deployments.get("MasterChef");
+  const masterChef = new ethers.Contract(MasterChef.address, MasterChef.abi, ethers.provider.getSigner(deployer))
   if (await masterChef.owner() !== dev) {
     // Transfer ownership of MasterChef to dev
     console.log("Transfer ownership of MasterChef to dev")
