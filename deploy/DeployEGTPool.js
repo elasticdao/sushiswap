@@ -9,7 +9,7 @@ module.exports = async function ({ ethers, getNamedAccounts, deployments, getCha
   const UniswapV2Factory = await deployments.get("UniswapV2Factory");
   const uniswapV2Factory = new ethers.Contract(UniswapV2Factory.address, UniswapV2Factory.abi, ethers.provider.getSigner(deployer));
   const WETH = await deployments.get("WETH9Mock");
-  const pair = await uniswapV2Factory.createPair(WETH.address, "0x33Fdb575368330F92a08dA84f50C07E667B294F2", { gasLimit: 3000000 });
+  const pair = await uniswapV2Factory.createPair(WETH.address, "0x33Fdb575368330F92a08dA84f50C07E667B294F2");
 
   console.log('SushiSwap: Pair Deployed', await pair.wait());
 }
